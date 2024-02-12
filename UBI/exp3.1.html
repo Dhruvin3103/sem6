@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Display a map on a webpage</title>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        #map {
+            flex: 1;
+        }
+        #content {
+            padding: 10px;
+            background-color: #f4f4f4;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div id="content">
+        <p>Displaying location using Latitude and Longitude</p>
+        <button class="geeks" onclick="getLocation()">
+            Click Me
+        </button>
+        <p id="demo1"></p>
+        <p>Enter your age:</p>
+        <input type="number" id="userAge" placeholder="Enter your age">
+        <button onclick="getNearbyPlaces()">Find Nearby Places</button>
+        <p id="nearbyPlaces"></p>
+        <p>Select your gender:</p>
+        <select id="userGender">
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+        </select>
+    </div>
+    <script>
+        var map;
+        var userMarker;
+        var nearbyMarker;
+        let variable1 = document.getElementById("demo1");
+        function initMap() {
+            map = L.map('map').setView([0, 0], 2);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+        }
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition);
+            } else {
+                console.error("Geolocation is not supported by this browser.");
+            }
+        }
+        function showPosition(position) {
+            var lat = position.coords.latitude;
+            var lon = position.coords.longitude;
+            variable1.innerHTML =
+                "Latitude: " +
+                lat +
+                "<br>Longitude: " +
+                lon;
+            console.log(lat, lon);
+            displayMap(lon, lat);
+            console.log(lat, lon);
+        }
+        function displayMap(lon, lat) {
+            if (!map) {
+                initMap();
+            }
+            map.setView([lat, lon], 15);
+
+            if (userMarker) {
+                userMarker.setLatLng([lat, lon]);
+            } else {
+                userMarker = L.marker([lat, lon]).addTo(map)
+                    .bindPopup('You are here!')
+                    .openPopup();
+            }
+        }
+        function getMarkerIcon(color) {
+            return L.icon({
+                iconUrl: 'https://www.svgrepo.com/show/376955/map-marker.svg',
+                iconSize: [30, 41],
+                iconAnchor: [12, 41],
+                popupAnchor: [1, -34],
+                shadowSize: [41, 41],
+            });
+        }
+        function displayMarker(lon, lat, place) {
+            if (nearbyMarker) {
+                nearbyMarker.setLatLng([lat, lon]);
+            } else {
+                nearbyMarker = L.marker([lat, lon], { icon: getMarkerIcon('#ff0000') }).addTo(map)
+                    .bindPopup(place)
+                    .openPopup();
+            }
+        }
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * (Math.PI / 180);
+            const dLon = (lon2 - lon1) * (Math.PI / 180);
+            const a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            const distance = R * c;
+            return distance.toFixed(2);
+        }
+        function getNearbyPlaces() {
+            let variable1 = document.getElementById("demo1");
+            let nearbyPlacesDisplay = document.getElementById("nearbyPlaces");
+            let moodSelector = 'library';
+            let userLat = variable1.innerHTML.split("<br>")[0].split(":")[1].trim();
+            let userLon = variable1.innerHTML.split("<br>")[1].split(":")[1].trim();
+            let userAge = document.getElementById("userAge").value;
+            let userGender = document.getElementById("userGender").value;
+            let ageBasedLocations = {
+                'child': {
+                    'male': {
+                        'library': [
+                            { lat: 19.100, lon: 72.850, name: 'Child Male Library 1', address: 'Child Male Library Address 1' },
+                            { lat: 19.110, lon: 72.860, name: 'Child Male Library 2', address: 'Child Male Library Address 2' }
+                        ],
+                        'restaurant': [
+                            { lat: 19.120, lon: 72.870, name: 'Child Male Restaurant 1', address: 'Child Male Restaurant Address 1' },
+                            { lat: 19.130, lon: 72.880, name: 'Child Male Restaurant 2', address: 'Child Male Restaurant Address 2' }
+                        ],
+                        'beach': [
+                            { lat: 19.140, lon: 72.890, name: 'Child Male Beach 1', address: 'Child Male Beach Address 1' },
+                            { lat: 19.150, lon: 72.900, name: 'Child Male Beach 2', address: 'Child Male Beach Address 2' }
+                        ]
+                    },
+                    'female': {
+                        'library': [
+                            { lat: 19.200, lon: 72.850, name: 'Child female Library 1', address: 'Child female Library Address 1' },
+                            { lat: 19.210, lon: 72.860, name: 'Child female Library 2', address: 'Child female Library Address 2' }
+                        ],
+                        'restaurant': [
+                            { lat: 19.120, lon: 72.890, name: 'Child female Restaurant 1', address: 'Child female Restaurant Address 1' },
+                            { lat: 19.130, lon: 72.910, name: 'Child female Restaurant 2', address: 'Child female Restaurant Address 2' }
+                        ],
+                        'beach': [
+                            { lat: 19.145, lon: 72.895, name: 'Child female Beach 1', address: 'Child female Beach Address 1' },
+                            { lat: 19.173, lon: 72.995, name: 'Child female Beach 2', address: 'Child female Beach Address 2' }
+                        ]
+                    }
+                },
+                'teenager': {
+                    'male': {
+                        'library': [
+                            { lat: 19.125, lon: 72.875, name: 'teenager Male Library 1', address: 'teenager Male Library Address 1' },
+                            { lat: 19.111, lon: 72.864, name: 'teenager Male Library 2', address: 'teenager Male Library Address 2' }
+                        ],
+                        'restaurant': [
+                            { lat: 19.122, lon: 72.876, name: 'teenager Male Restaurant 1', address: 'teenager Male Restaurant Address 1' },
+                            { lat: 19.130, lon: 72.881, name: 'teenager Male Restaurant 2', address: 'teenager Male Restaurant Address 2' }
+                        ],
+                        'beach': [
+                            { lat: 19.144, lon: 72.8780, name: 'teenager Male Beach 1', address: 'teenager Male Beach Address 1' },
+                            { lat: 19.152, lon: 72.9140, name: 'teenager Male Beach 2', address: 'teenager Male Beach Address 2' }
+                        ]
+                    },
+                    'female': {
+                        'library': [
+                            { lat: 19.1145, lon: 72.815, name: 'teenager female Library 1', address: 'teenager female Library Address 1' },
+                            { lat: 19.112, lon: 72.847, name: 'teenager female Library 2', address: 'teenager female Library Address 2' }
+                        ],
+                        'restaurant': [
+                            { lat: 19.1244, lon: 72.8487, name: 'teenager female Restaurant 1', address: 'teenager female Restaurant Address 1' },
+                            { lat: 19.1140, lon: 72.8654, name: 'teenager female Restaurant 2', address: 'teenager female Restaurant Address 2' }
+                        ],
+                        'beach': [
+                            { lat: 19.140, lon: 72.890, name: 'teenager female Beach 1', address: 'teenager female Beach Address 1' },
+                            { lat: 19.150, lon: 72.900, name: 'teenager female Beach 2', address: 'teenager female Beach Address 2' }
+                        ]
+                    }
+                },
+                'adult': {
+                    'male': {
+                        'library': [
+                            { lat: 19.100, lon: 72.850, name: 'adult Male Library 1', address: 'adult Male Library Address 1' },
+                            { lat: 19.110, lon: 72.860, name: 'adult Male Library 2', address: 'adult Male Library Address 2' }
+                        ],
+                        'restaurant': [
+                            { lat: 19.120, lon: 72.870, name: 'adult Male Restaurant 1', address: 'adult Male Restaurant Address 1' },
+                            { lat: 19.130, lon: 72.880, name: 'adult Male Restaurant 2', address: 'adult Male Restaurant Address 2' }
+                        ],
+                        'beach': [
+                            { lat: 19.140, lon: 72.890, name: 'adult Male Beach 1', address: 'adult Male Beach Address 1' },
+                            { lat: 19.150, lon: 72.900, name: 'adult Male Beach 2', address: 'adult Male Beach Address 2' }
+                        ]
+                    },
+                    'female': {
+                        'library': [
+                            { lat: 19.100, lon: 72.850, name: 'adult female Library 1', address: 'adult female Library Address 1' },
+                            { lat: 19.110, lon: 72.860, name: 'adult female Library 2', address: 'adult female Library Address 2' }
+                        ],
+                        'restaurant': [
+                            { lat: 19.120, lon: 72.870, name: 'adult female Restaurant 1', address: 'adult female Restaurant Address 1' },
+                            { lat: 19.130, lon: 72.880, name: 'adult female Restaurant 2', address: 'adult female Restaurant Address 2' }
+                        ],
+                        'beach': [
+                            { lat: 19.140, lon: 72.890, name: 'adult female Beach 1', address: 'adult female Beach Address 1' },
+                            { lat: 19.150, lon: 72.900, name: 'adult female Beach 2', address: 'adult female Beach Address 2' }
+                        ]
+                    }
+                }
+            };
+            let locations = {
+                restaurant: [
+                    { lat: 19.181332, lon: 72.857996, name: "Restaurant 1", address: "Restaurant 1 Address" },
+                    { lat: 19.182332, lon: 72.858996, name: "Restaurant 2", address: "Restaurant 2 Address" },
+                ],
+                movie: [
+                    { lat: 19.187846, lon: 72.847506, name: "Movie Theater 1", address: "Movie Theater 1 Address" },
+                    { lat: 19.187628, lon: 72.848155, name: "Movie Theater 2", address: "Movie Theater 2 Address" },
+                ],
+                beach: [
+                    { lat: 19.098823, lon: 72.826268, name: "Beach 1", address: "Beach 1 Address" },
+                    { lat: 19.097964, lon: 72.826272, name: "Beach 2", address: "Beach 2 Address" },
+                ]
+            };
+
+            let ageGroup = getAgeGroup(userAge);
+            let selectedLocationType = ageBasedLocations[ageGroup];
+            let ageGroupLocations = ageBasedLocations[ageGroup];
+            console.log(ageGroupLocations,ageBasedLocations[userAge],ageGroup);
+            console.log(ageGroupLocations[userGender]);
+
+            if (ageGroupLocations && ageGroupLocations[userGender]) {
+                console.log(ageGroupLocations[userGender],moodSelector);
+            let selectedLocationType = ageGroupLocations[userGender][moodSelector];
+                
+                if (selectedLocationType) {
+                    let closestLocation = findClosestLocation(userLat, userLon, selectedLocationType);
+                    if (closestLocation) {
+                        let distance = calculateDistance(
+                            userLat, userLon,
+                            closestLocation.lat, closestLocation.lon
+                        );
+                        nearbyPlacesDisplay.innerHTML = `<strong>${closestLocation.name}:</strong><br>`;
+                        nearbyPlacesDisplay.innerHTML += `Distance: ${distance} km<br>`;
+                        nearbyPlacesDisplay.innerHTML += `Address: ${closestLocation.address}`;
+                        displayMarker(closestLocation.lon, closestLocation.lat, closestLocation.name);
+                    } else {
+                        nearbyPlacesDisplay.innerHTML = "No locations found for the selected mood.";
+                    }
+                } else {
+                    nearbyPlacesDisplay.innerHTML = "Invalid mood selection.";
+                }
+            } else {
+                nearbyPlacesDisplay.innerHTML = "Invalid age or gender selection.";
+            }
+        }
+
+        function getAgeGroup(age) {
+            age = parseInt(age);
+            console.log(age);
+            if (age <= 12) {
+                return 'child';
+            } else if (age <= 18) {
+                return 'teenager';
+            } else {
+                return 'adult';
+            }
+        }
+
+        function findClosestLocation(userLat, userLon, locations) {
+            let closestLocation = null;
+            let closestDistance = Infinity;
+            for (let i = 0; i < locations.length; i++) {
+                let distance = calculateDistance(userLat, userLon, locations[i].lat, locations[i].lon);
+                if (distance < closestDistance) {
+                    closestDistance = distance;
+                    closestLocation = locations[i];
+                }
+            }
+            return closestLocation;
+        }
+        getLocation();
+    </script>
+</body>
+</html>
