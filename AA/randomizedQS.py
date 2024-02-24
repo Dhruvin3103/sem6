@@ -43,7 +43,7 @@ def quicksort(arr):
         # print(left,quicksort(left),pivot,right,quicksort(right))
         # return quicksort(left) + [pivot] + quicksort(right)
         
-arr = [i for i in range(50)]
+arr = [i for i in range(500)]
 print('Normal Quicksort')
 print("Sorted Array:", quicksort(arr))
 print("Number of Comparisons:", c2)
