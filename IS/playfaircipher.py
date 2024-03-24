@@ -1,4 +1,4 @@
-key = 'CIPHER'
+key = input("Enter key : ").upper()
 
 import string
 
@@ -14,12 +14,15 @@ def make_matrix(key):
     matrix = list(key)
     matrix.extend(letters)
     matrix = [matrix[i:i+5] for i in range(0,25,5)]
-
     return matrix
 
-print(f"matrix : {make_matrix(key)}")
+word = input("Enter plaintext : ").upper()
+print(f"key: {key}\nplain text: {word}\n")
+
+print(f"matrix : ")
 cipher_matrix = make_matrix(key)
-word = 'crpytography'.upper()
+for row in cipher_matrix:
+    print(row)
 
 def create_pairs(word):
     pairs = []
@@ -65,12 +68,11 @@ def search(matrix,elmt):
                 return i,j
             
 
-def playfair(mat,txt):
+def playfair_encrypt(mat,txt):
     cipher = []
     for i in txt:
         a,b = search(mat,i[0])
         c,d = search(mat,i[1])
-        
         if b == d:
             word = ""
             if a+1>4:
@@ -95,11 +97,50 @@ def playfair(mat,txt):
                 word += mat[c][d+1]
             cipher.append(word)
         
-        elif b+1 == c or b == c+1:
-            word += mat[a]
+        else:
+            word = mat[a][d] + mat[c][b]
+            cipher.append(word)
     return cipher
 
-print(playfair(cipher_matrix,mod_text))
+def playfair_decrypt(mat, txt):
+    plaintext = []
+    for i in txt:
+        a, b = search(mat, i[0])
+        c, d = search(mat, i[1])
+        if b == d:  
+            word = ""
+            if a - 1 < 0:
+                word += mat[4][b]
+            else:
+                word += mat[a - 1][b]
+            if c - 1 < 0:
+                word += mat[4][d]
+            else:
+                word += mat[c - 1][d]
+            plaintext.append(word)
+
+        elif a == c:  
+            word = ""
+            if b - 1 < 0:
+                word += mat[a][4]
+            else:
+                word += mat[a][b - 1]
+            if d - 1 < 0:
+                word += mat[c][4]
+            else:
+                word += mat[c][d - 1]
+            plaintext.append(word)
+
+        else:
+            word = mat[a][d] + mat[c][b]
+            plaintext.append(word)
+
+    return plaintext
+
+cipher_txt = "".join(playfair_encrypt(cipher_matrix,mod_text))
+print(f"Cipher Text is : {cipher_txt}")
+decrypt_txt = "".join(playfair_decrypt(cipher_matrix, create_pairs(cipher_txt)))
+print(f"Decrypted Text : {decrypt_txt}")
             
             
      

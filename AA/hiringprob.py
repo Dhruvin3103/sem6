@@ -15,14 +15,13 @@ print("Interviewed candidates:", interviewed_candidates)
 print("Hired candidates:", hired_candidates)
 print("Number of candidates hired:", len(hired_candidates))
 print("Firing cost:", firing_cost)
-
 import random
 
 candidates = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 print("Candidates: ", candidates)
 interviewed_candidates = []
 hired_candidates = []
-print('\nRandomized Approach')
+print("\nRandomized Approach")
 # Randomly select and interview candidates
 for i in range(len(candidates)):
     selected_candidate = random.choice(candidates)

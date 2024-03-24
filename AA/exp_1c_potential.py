@@ -1,4 +1,3 @@
-
 doubling_costs = []
 current_length = 1
 potential = []

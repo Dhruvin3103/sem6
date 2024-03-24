@@ -1,8 +1,7 @@
 import math
 
-pt = "ATTACKTHETARGETONNINE"
-key = "APPLE"
-
+pt = input("Enter the plaintext : ").upper()
+key = input("Enter the key : ").upper()
 
 def find_rank(key):
     rank = 0
@@ -32,21 +31,26 @@ def encrypt(pt, key):
         res.extend(i)
     return "".join(res)
 
+
 def decrypt(cip, key):
     cols = len(key)
     rows = math.ceil(len(cip) / cols)
     key_rank = find_rank(key)
-    print(key_rank)
     cip += "".join(["X"] * (rows * cols - len(cip)))
-    matrix = ["*" for i in  range(rows)]
-    for i in key_rank:
-        matrix[i] = [list(cip[i : i + cols]) for i in range(0, len(cip), cols)]
+    cip_mat  = [list(cip[i:i+rows]) for i in range(0, len(cip), rows)]
+    res = []
     for i in range(rows):
-        print(matrix[i])
-    cip = ["*" for i in range(cols)]
+        a = ["*"] *(len(key_rank))
+        count = 0
+        for r in key_rank:
+            a[count] = cip_mat[r][i]
+            count +=1
+        res.extend(a)
+    return "".join(res).rstrip("X")
 
 
-
+print(f"\nPlain text : {pt}\nKey:{key}\n")
 ciphertext = encrypt(pt, key)
-print(ciphertext)
-decrypt(ciphertext, key)
+print(f"After encryption, Cipher Text : {ciphertext}\n")
+decrypted_text = decrypt(ciphertext, key)
+print(f"After decryption, Plain Text : {decrypted_text}")
