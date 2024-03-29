@@ -1,52 +1,51 @@
 def left_rotate(x, n):
-  """Performs a left rotation on a 32-bit integer."""
-  return ((x << n) | (x >> (32 - n))) & 0xffffffff  # Ensure 32-bit result
+    return ((x << n) | (x >> (32 - n))) & 0xFFFFFFFF
 
-def md5_like(message):
-  """
-  Simplified MD5-like function (not cryptographically secure).
-  Processes a message string and returns a pseudo-digest in hexadecimal.
-  """
 
-  # Constants (adjust for a more complete implementation)
-  K = [0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476]
+def md5(message):
+    # Step 1 and 2 : Padding and Append Length
+    padding_length = 0
+    if (len(message) + 64) % 512:
+        message += "1"
+        padding_length = 512 - ((len(message) + 64) % 512)
+        
+    message += "0" * padding_length
+    print(f"Padding Length  : {padding_length+1}")
+    # step 3 : Divide the input into 512 bit blocks
+    message_words = [int(message[i : i + 32], 2) for i in range(0, len(message), 32)]
+    original_message_length = len(message) - 64
+    message_words.append(original_message_length)
+    # Step 4: Initialise the chaining variables
+    # Hexadecimal Constants are initailized
+    K = [0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476]
+    print(f"Chaining variables are : {K}")
 
-  # Preprocessing (assuming ASCII message)
-  message_bytes = bytearray(message, 'ascii')
-  message_len = len(message_bytes) * 8  # Length in bits
-  message_bytes.append(0x80)  # Padding bit
-  while len(message_bytes) % 64 != 56:
-    message_bytes.append(0)
-  message_bytes += message_len.to_bytes(8, 'big')  # Append message length
+    def F(x, y, z):
+        return (x & y) | (~x & z)
 
-  # Divide message into 512-bit (16-word) chunks
-  words = [message_bytes[i:i+4] for i in range(0, len(message_bytes), 4)]
-  words = [int.from_bytes(w, 'big') for w in words]
+    # step 5 : process Block
+    a, b, c, d = K
+    for i in range(0, len(message_words), 16):
+        f = F(b, c, d)
+        g = (i >> 2) & 0x03
+        for j in range(16):
+            if i + j < len(message_words):
+                temp = (a + f + message_words[i + j] + g) & 0xFFFFFFFF
+                a = d
+                d = c
+                c = b
+                b = (b + left_rotate(temp, 7)) & 0xFFFFFFFF
+    digest = format(a, "08x")
+    digest += format(b, "08x")
+    digest += format(c, "08x")
+    digest += format(d, "08x")
+    return digest
 
-  # Function F (simplified)
-  def F(x, y, z):
-    return (x & y) | (~x & z)
-
-  # Main loop (highly simplified, not a secure implementation)
-  a, b, c, d = K
-  for i in range(len(words)):
-    f = F(b, c, d)
-    g = (i >> 2 & 0x03)  # Simplified function selection
-    a = left_rotate((a + f + words[i] + g) & 0xffffffff, 7)
-    d = b
-    b = c
-    c = a
-
-  # Combine final state (not a secure digest)
-  digest = (a & 0xffffffff).to_bytes(4, 'big')
-  digest += (b & 0xffffffff).to_bytes(4, 'big')
-  digest += (c & 0xffffffff).to_bytes(4, 'big')
-  digest += (d & 0xffffffff).to_bytes(4, 'big')
-
-  # Return pseudo-digest in hexadecimal
-  return digest.hex()
 
 # Example usage
-message = "Hello, world!"
-pseudo_digest = md5_like(message)
-print("Pseudo-MD5 Digest:", pseudo_digest)
+import random
+
+random_message = "".join([random.choice(["0", "1"]) for _ in range(1000)])
+print("Random 1000-bit message:", random_message)
+first_round_res = md5(random_message)
+print("After First Round :", first_round_res)
