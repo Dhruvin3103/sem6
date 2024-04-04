@@ -1,4 +1,4 @@
-def rsa(p,q,e,msg):
+def rsa(p, q, e, msg):
     # p = 7
     # q = 11
     # p,q = int(input("Enter p : ")), int(input("Enter q : "))
@@ -14,8 +14,12 @@ def rsa(p,q,e,msg):
     print(f"p : {p}, q : {q}, message bits : {msg}, e:{e}")
     print(f"Public key : {(e,n)}\nPrivate Key : {(d,n)}\n")
     print("Message data = ", msg)
-    c = (msg**e) % n
+    # c = (msg**e) % n
+    c = pow(msg,e,n)
     print("Encrypted data = ", c)
-    m = (c**d) % n
+    # m = (c**d) % n
+    m = pow(c,d,n)
     print("Original Message Sent = ", m)
-    
+
+
+rsa(103, 109, 251, 14521)
