@@ -41,9 +41,14 @@ def verify_signature(public_key, message, signature):
         return False
 
 private_key, public_key = generate_key_pair()
+
 message = b"Hello, this is a test message."
-signature = sign_message(private_key, message)
-print("Message:", message)
+print("Original Message:", message)
+digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
+digest.update(message)
+hashed_message = digest.finalize()
+print("Hashed Message:", hashed_message.hex())
+signature = sign_message(private_key, hashed_message)
 print("Signature:", signature.hex())
-verification_result = verify_signature(public_key, message, signature)
+verification_result = verify_signature(public_key, hashed_message, signature)
 print("Signature Verification Result:", verification_result)
