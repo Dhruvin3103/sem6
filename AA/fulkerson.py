@@ -32,6 +32,7 @@ def modify_G(G, path, flw):
         G[u][v] -= flw
         G[v][u] += flw  
     return G
+
 #        D   M   K   B  P  s
 G =     [[0, 8, 14, 0, 0, 0],
          [0, 0, 14, 12, 0, 0],
