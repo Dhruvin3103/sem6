@@ -9,8 +9,10 @@ def gs(points):
     if n < 3: 
         return [] 
     min_pt = min(points, key=lambda x: (x[1], x[0])) 
+    print(min_pt)
     sort_pts = sorted(points, key=lambda x: (math.atan2(x[1] - min_pt[1], x[0] - min_pt[0]), 
 x)) 
+    print(sort_pts)
     stack = [sort_pts[0], sort_pts[1], sort_pts[2]] 
     print(f"After addition 3 points , stack : {stack}") 
     for i in range(3, n): 
