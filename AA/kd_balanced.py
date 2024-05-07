@@ -12,7 +12,7 @@ def build_kdtree(points, depth=0):
     if not points: # edge cases 
         return None 
     k = len(points[0]) 
-    axis = depth % k # axis means konse ke basis pe sort krna hai x ki y aur modulo isliye kiya hai kyu ki wo revolve around x,y hi krna chahiye aur z hai to wo bhi 
+    axis = depth % k # axis means konse ke basis pe sort krna hai x ki y aur modulo isliye kiya hai kyu ki wo revolve around krke x,y pe, also z ho sakta agar k =3  
     points.sort(key=lambda x: x[axis]) # sort krna hai based on the axis so agar 1st level hai to x ke basis fir 2nd pe y, 3rd pe x (but agar k=3 to z ke basis pe sort hoga )
     median = len(points) // 2 # middle postion find kr raha 
     node = Node(points[median], axis) # node ko define krne ka syntax hai point diya hai or level konsa hai wo 
