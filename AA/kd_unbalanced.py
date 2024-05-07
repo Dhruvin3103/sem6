@@ -22,7 +22,9 @@ def print_tree(node, level=0, side=None):
 points = [[3, 6], [17, 15], [13, 15], [6, 12], [9, 1], [2, 7], [10, 19]]
 
 root = None 
+
+# idar har point pe wo function me ja rha fir root ka dict update hoga 
 for point in points: 
-    root = insert(root, point) 
+    root = insert(root, point,0) 
 
 print_tree(root)
