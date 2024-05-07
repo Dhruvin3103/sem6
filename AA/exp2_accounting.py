@@ -1,52 +1,43 @@
-class DynamicTable:
-    def __init__(self):
-        self.capacity = 1  
-        self.size = 0
-        self.table = [None] * self.capacity
-    def insert(self, value):
-        if self.size == self.capacity:
-            self._resize(self.capacity * 2)
+def initialize_dynamic_table():
+    capacity = 1
+    size = 0
+    table = [None] * capacity
+    return table, capacity, size
+def insert(table, value, capacity, size):
+    if size == capacity:
+        table, capacity = resize(table, capacity)
+    table[size] = value
+    size += 1
+    return table, capacity, size
+def resize(table, capacity):
+    new_capacity = capacity * 2
+    new_table = [None] * new_capacity
+    for i in range(len(table)):
+        new_table[i] = table[i]
+    return new_table, new_capacity
+def cost_calculation(size):
+    insertion_cost = 1
+    amortized_cost = 3
+    doubling_copying = 0
+    total_cost = insertion_cost + doubling_copying
+    bank_balance = amortized_cost - total_cost
+    current_size = 1
+    previous_size = 1
+    print("i\tP.S\tS\tD.C\tI\tT.C\tAm.C\tBank")
+    for i in range(1, size + 1):
+        print(f"{i}\t{previous_size}\t{current_size}\t{doubling_copying}\t{insertion_cost}\t{total_cost}\t{amortized_cost}\t{bank_balance}")
+        previous_size = current_size
+        if i==current_size:
+            current_size*= 2
+            doubling_copying = current_size - previous_size
         else:
-            self.doubling_copy = 0
-        self.table[self.size] = value
-        self.size += 1
-    def _resize(self, new_capacity):
-        new_table = [None] * new_capacity
-        for i in range(self.size):
-            new_table[i] = self.table[i]
-        self.table = new_table
-        self.capacity = new_capacity
-    def print_table(self):
-        print(self.table)
-
-    def cost_calculation(self):
-        insertion_cost = 1
-        amortized_cost = 3
-        doubling_copying = 0 
+            doubling_copying=0      
         total_cost = insertion_cost + doubling_copying
-        bank_balance = amortized_cost - total_cost
-        size = 1
-        previous_size = 1  
-        print("i\tP.S\tS\tD.C\tI\tT.C\tAm.C\tBank")
-        for i in range(1,self.size+1):
-            if i < size:
-                print(f"{i}\t{previous_size}\t{size}\t{doubling_copying}\t{insertion_cost}\t{total_cost}\t{amortized_cost}\t{bank_balance}")
-                previous_size = size
-                doubling_copying = previous_size - size
-                total_cost = insertion_cost + doubling_copying
-                bank_balance = amortized_cost - total_cost + bank_balance
-            else:
-                print(f"{i}\t{previous_size}\t{size}\t{doubling_copying}\t{insertion_cost}\t{total_cost}\t{amortized_cost}\t{bank_balance}")
-                previous_size = size
-                size = size * 2
-                doubling_copying = size - previous_size
-                total_cost = insertion_cost + doubling_copying
-                bank_balance = amortized_cost - total_cost + bank_balance
-
-table = DynamicTable()
+        bank_balance = amortized_cost - total_cost + bank_balance
+table, capacity, size = initialize_dynamic_table()
 for i in range(1, 16):
-    table.insert(i)
+    table, capacity, size = insert(table, i, capacity, size)
     print(f"Inserted {i}. Table:")
-    table.print_table()
+    print(table)
 print("Cost Calculation:")
-table.cost_calculation()
+cost_calculation(size)
