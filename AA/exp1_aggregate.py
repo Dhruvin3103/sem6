@@ -1,50 +1,43 @@
-arr = [8,3,1,9,8,7,3,6]
+arr=[8,3,1,9,8,7,3,6]
+stack=[]
+stack_len=8
+unit=[]
+operations_count=0
 
-stack = []
-stack_len = 8
-
-unit = []
-op_count = 0
-
-def popstack():
-    if len(stack) == 0:
-        return 
-    else:
-        top_element = stack[-1]
-        stack.pop()
-        # print(stack)
-    
-def pushstack(element):
-    global op_count
-    if len(stack) < stack_len:
-        op_count +=1
+def push(element):
+    global operations_count,unit,stack_len
+    if len(stack)<=stack_len:
         stack.append(element)
-        print(f"push - 1 unit stack is {stack}")
+        operations_count+=1
         unit.append(1)
-    else:
-        return
+        print(f"Stack after pushing {element} is {stack} and the unit array is {unit}")
     
+def pop():
+    if len(stack)<=0:
+        return
+    else:
+        top_element=stack[-1]
+        stack.pop()
+        # print(f"Stack after popping the element {top_element} is {stack}")
+        
 def multipop(k):
-    global op_count
-    count = 0
+    global operations_count,unit
+    num_of_elements=0
     for i in range(k):
-        if len(stack) != 0:
-            popstack()
-            op_count +=1
-            count +=1
-    return count
+        if len(stack)!=0:
+            pop()
+            num_of_elements+=1
+            operations_count+=1
+    unit.append(num_of_elements)
+    print(f"Stack after popping {k} elements is {stack} and the unit array is {unit}")
+    return num_of_elements
 
 for i in arr:
-    count = 0
-    flag = 0
-    print(f"for element {i}")
+    print(f"element {i} : - ")
     if i<=len(stack):
-        count = multipop(i)
-        unit.append(count)
-        print(f"multipop - {count} unit stack is {stack}")
-    pushstack(i)
+        print(f"since {i} is less than equal to {len(stack)}, therefore we multipop {i} element/s")
+        multipop(i)
+    push(i)
 
-print(f"T(n) = {sum(unit)} and n = {op_count}")
-print(f"amortized aggregate asymtotic notaion has complexity as o({sum(unit)//op_count})")
-# print(unit,sum(unit),op_count)
-    
+print(f"T(n)={sum(unit)} and num of operations is {operations_count}")
+print(f"Time complexity O({sum(unit)//operations_count})")
