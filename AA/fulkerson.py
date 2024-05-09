@@ -1,49 +1,35 @@
-from collections import deque
-
-def ford_fulkerson(G, source, sink):
-    max_flw = 0
-    allpath,path_flws = [],[]
+def dfs(graph, source, sink, visited, path):
+    visited[source] = True
+    if source == sink:
+        return path
+    for v in range(len(graph[source])):
+        if not visited[v] and graph[source][v] > 0:
+            result = dfs(graph, v, sink, visited, path + [v])
+            if result:
+                return result
+    return None
+def ford_fulkerson_dfs(graph, source, sink):
+    all_paths = []
+    path_flows = []
     while True:
-        paths = bfs(G, source, sink)
-        if not paths:
+        path = dfs(graph, source, sink, [False]* len(graph), [source])
+        if path is None:
             break
-        for path in paths:
-            path_flw = min(G[path[i]][path[i+1]] for i in range(len(path)-1))
-            allpath.append(path)
-            path_flws.append(path_flw)
-            max_flw += path_flw
-            G = modify_G(G, path, path_flw)
-    return max_flw, allpath, path_flws
-def bfs(G, source, sink):
-    paths = []
-    queue = deque([(source, [source])])
-    while queue:
-        u, path = queue.popleft()
-        for v, capacity in enumerate(G[u]):
-            if capacity > 0 and v not in path:
-                if v == sink:
-                    paths.append(path + [v])
-                else:
-                    queue.append((v, path + [v]))
-    return paths
-def modify_G(G, path, flw):
-    for i in range(len(path)-1):
-        u, v = path[i], path[i+1]
-        G[u][v] -= flw
-        G[v][u] += flw  
-    return G
-
-#        D   M   K   B  P  s
-G =     [[0, 8, 14, 0, 0, 0],
-         [0, 0, 14, 12, 0, 0],
-         [0, 6, 0, 0, 10, 0],
-         [0, 0, 10, 0, 0, 17],
-         [0, 0, 0, 7, 0, 6],
-         [0, 0, 0, 0, 0, 0]]
-source = 0
-sink = 5
-max_flw, allpath, path_flws = ford_fulkerson(G, source, sink)
-print(f"Maximum flow: {max_flw}")
-print("<-----All augmenting paths and their corresponding flows----->")
-for i, path in enumerate(allpath):
-    print(f"Path --> {path}, flow along path: {path_flws[i]}")
+        path_flow = min(graph[path[i]][path[i + 1]] for i in range(len(path) - 1))
+        all_paths.append(path)
+        path_flows.append(path_flow)
+        for i in range(len(path) - 1):
+            u, v = path[i], path[i + 1]
+            graph[u][v] -= path_flow
+            graph[v][u] += path_flow
+    return all_paths, path_flows
+graph = [[0, 16, 13, 0, 0, 0],
+    [0, 0, 10, 12, 0, 0],
+    [0, 4, 0, 0, 14, 0],
+    [0, 0, 9, 0, 0, 20],
+    [0, 0, 0, 7, 0, 4],
+    [0, 0, 0, 0, 0, 0]]
+all_paths, path_flows = ford_fulkerson_dfs(graph, source=0, sink=5)
+print("Maximum flow:", sum(path for path in path_flows))
+for path,path_flow in zip(all_paths,path_flows):
+    print(f"Path:{path}\nFlow along path:{path_flow}")
