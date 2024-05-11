@@ -1,147 +1,50 @@
-key = input("Enter key : ").upper()
-
-import string
-
-def make_matrix(key):
-    letters = list(string.ascii_uppercase)
-    for letter in key:
-        if letter == 'I' or letter == 'J':
-            letters.remove('I')
-            letters.remove('J')
-        else:
-            letters.remove(letter)
-        
-    matrix = list(key)
-    matrix.extend(letters)
-    matrix = [matrix[i:i+5] for i in range(0,25,5)]
+def create_matrix(key, list1=['A','B','C','D','E','F','G','H','I','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']):
+    key_letters,compElements,matrix = [],[],[]
+    for i in key:
+        if i not in key_letters:
+            key_letters.append(i)
+            compElements.append(i) 
+    for i in list1:
+        if i not in compElements:
+            compElements.append(i)
+    while compElements != []:
+        matrix.append(compElements[:5])
+        compElements = compElements[5:] 
     return matrix
-
-word = input("Enter plaintext : ").upper()
-print(f"key: {key}\nplain text: {word}\n")
-
-print(f"matrix : ")
-cipher_matrix = make_matrix(key)
-for row in cipher_matrix:
-    print(row)
-
-def create_pairs(word):
-    pairs = []
-    if len(word) % 2 != 0:
-        word += word[-1]
-    for i in range(0, len(word), 2):
-        pair = word[i:i+2]
-        pairs.append(pair)
-    return pairs
-
-
-def add_extra_character(word):
-    result = ""
-    extra_char = find_missing_letters(word)
-    for i in range(len(word) - 1):
-        result += word[i]
-        if word[i] == word[i + 1]:
-            while extra_char in result or extra_char == word[i]:
-                extra_char = chr(ord(extra_char) + 1)
-            result += extra_char
-    result += word[-1]
-    
-    if len(result)%2!=0:
-        result += extra_char
-    return result
-    
-def find_missing_letters(word):
-    all_letters = set("abcdefghijklmnopqrstuvwxyz")
-    word_letters = set(word.lower())
-    missing_letters = all_letters - word_letters
-    return sorted(list(missing_letters))[0]
-result_word = add_extra_character(word)
-result = create_pairs(result_word)
-
-print(f"2pair of text : {result}")
-
-mod_text = result
-
-def search(matrix,elmt):
+def addBuffer(message):
+    index = 0
+    while (index < len(message)-1):
+        l1,l2 =message[index], message[index + 1]
+        if l1 == l2:
+            message = message[:index + 1] + "X" + message[index + 1:]
+        index += 2
+    if len(message)%2!=0:
+        message+='X'
+    return message
+def indexOf(letter, matrix):
     for i in range(5):
-        for j in range(5):
-            if matrix[i][j] == elmt:
-                return i,j
-            
-
-def playfair_encrypt(mat,txt):
-    cipher = []
-    for i in txt:
-        a,b = search(mat,i[0])
-        c,d = search(mat,i[1])
-        if b == d:
-            word = ""
-            if a+1>4:
-                word += mat[0][b]
-            else:
-                word += mat[a+1][b]
-            if c+1>4:
-                word += mat[0][d]
-            else:
-                word += mat[c+1][d]
-            cipher.append(word)
-        
-        elif a == c:
-            word = ""
-            if b+1>4:
-                word += mat[a][0]
-            else:
-                word += mat[a][b+1]
-            if d+1>4:
-                word += mat[c][0]
-            else:
-                word += mat[c][d+1]
-            cipher.append(word)
-        
+        try:
+            index = matrix[i].index(letter)
+            return (i, index)
+        except:
+            continue
+def playfair(key, message, encrypt=True):
+    inc = 1 if encrypt else -1
+    matrix = create_matrix(key)
+    message = message.replace(' ', '')
+    message = addBuffer(message)
+    cipher_text = ''
+    for (l1, l2) in zip(message[0::2], message[1::2]):
+        row1, col1 = indexOf(l1, matrix)
+        row2, col2 = indexOf(l2, matrix)
+        if row1 == row2:
+            cipher_text += matrix[row1][(col1 + inc) % 5] + matrix[row2][(col2 + inc) % 5]
+        elif col1 == col2:
+            cipher_text += matrix[(row1 + inc) % 5][col1] + matrix[(row2 + inc) % 5][col2]
         else:
-            word = mat[a][d] + mat[c][b]
-            cipher.append(word)
-    return cipher
-
-def playfair_decrypt(mat, txt):
-    plaintext = []
-    for i in txt:
-        a, b = search(mat, i[0])
-        c, d = search(mat, i[1])
-        if b == d:  
-            word = ""
-            if a - 1 < 0:
-                word += mat[4][b]
-            else:
-                word += mat[a - 1][b]
-            if c - 1 < 0:
-                word += mat[4][d]
-            else:
-                word += mat[c - 1][d]
-            plaintext.append(word)
-
-        elif a == c:  
-            word = ""
-            if b - 1 < 0:
-                word += mat[a][4]
-            else:
-                word += mat[a][b - 1]
-            if d - 1 < 0:
-                word += mat[c][4]
-            else:
-                word += mat[c][d - 1]
-            plaintext.append(word)
-
-        else:
-            word = mat[a][d] + mat[c][b]
-            plaintext.append(word)
-
-    return plaintext
-
-cipher_txt = "".join(playfair_encrypt(cipher_matrix,mod_text))
-print(f"Cipher Text is : {cipher_txt}")
-decrypt_txt = "".join(playfair_decrypt(cipher_matrix, create_pairs(cipher_txt)))
-print(f"Decrypted Text : {decrypt_txt}")
-            
-            
-     
-
+            cipher_text += matrix[row1][col2] + matrix[row2][col1]
+    return cipher_text
+plainText = input("Enter the Plain text: ").upper()
+key = input("Enter Key: ").upper()
+cipherText = playfair(key, plainText)
+print(f'Encrypted:{cipherText}\nDecrypted:{playfair(key, cipherText, encrypt=False)}')
