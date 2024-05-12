@@ -1,8 +1,7 @@
 def create_matrix(key, list1=['A','B','C','D','E','F','G','H','I','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']):
-    key_letters,compElements,matrix = [],[],[]
+    compElements,matrix = [],[]
     for i in key:
-        if i not in key_letters:
-            key_letters.append(i)
+        if i not in compElements:
             compElements.append(i) 
     for i in list1:
         if i not in compElements:
@@ -45,6 +44,6 @@ def playfair(key, message, encrypt=True):
             cipher_text += matrix[row1][col2] + matrix[row2][col1]
     return cipher_text
 plainText = input("Enter the Plain text: ").upper()
-key = input("Enter Key: ").upper()
+key = input("Enter Key: ").upper().replace('J','I')
 cipherText = playfair(key, plainText)
 print(f'Encrypted:{cipherText}\nDecrypted:{playfair(key, cipherText, encrypt=False)}')
