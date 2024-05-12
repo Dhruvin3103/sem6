@@ -5,17 +5,16 @@ def is_prime(n):
         if n % i == 0:
             return False
     return True
-def primitive_check(g, p, list=[]):
-    for i in range(1, p):
-        list.append(pow(g, i) % p)
-    for i in range(1, p):
-        if list.count(i) > 1:
-            return -1
-        return 1   
+def isPrimitiveRoot(g,p):
+    listt=[pow(g,i,p) for i in range(p-1)]
+    for i in listt:
+        if listt.count(i)>1:
+            return 0
+    return 1 
 while True:
     p=int(input("Enter values of p:"))
     g=int(input("Enter values of g:"))
-    if (is_prime(p) and primitive_check(g,p)):
+    if (is_prime(p) and isPrimitiveRoot(g,p)):
         a=int(input("Enter values of a:"))
         b=int(input("Enter values of b:"))
         if a >= p or b >= p:
