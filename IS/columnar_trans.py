@@ -16,9 +16,10 @@ def encrypt(pt, key):
     for i in range(rows):
         print(matrix[i])
     ciphertext = ""
-    for key in key_rank:
+    for ind in range(len(key_rank)):
+        col=key_rank.index(ind)
         for i in range(rows):
-            ciphertext+=matrix[i][key] 
+            ciphertext+=matrix[i][col] 
     return ciphertext
 def decrypt(cip, key):
     cols = len(key)
@@ -27,9 +28,10 @@ def decrypt(cip, key):
     count=0
     cip+= "".join(["X"] * (rows * cols - len(cip)))
     cip_mat = [[0 for col in range(cols)] for row in range(rows)]
-    for key in key_rank:
+    for ind in range(len(key_rank)):
+        col=key_rank.index(ind)
         for row in range(rows):
-            cip_mat[row][key] = cip[count]
+            cip_mat[row][col] = cip[count]
             count += 1
     print('--------------')
     for i in range(rows):
