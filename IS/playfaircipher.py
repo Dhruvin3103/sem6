@@ -1,4 +1,6 @@
-key = input("Enter key : ").upper()
+# key = input("Enter key : ").upper()
+key = "DEMON"
+
 
 import string
 
@@ -16,7 +18,8 @@ def make_matrix(key):
     matrix = [matrix[i:i+5] for i in range(0,25,5)]
     return matrix
 
-word = input("Enter plaintext : ").upper()
+# word = input("Enter plaintext : ").upper()
+word = "instruments".upper()
 print(f"key: {key}\nplain text: {word}\n")
 
 print(f"matrix : ")
@@ -36,24 +39,17 @@ def create_pairs(word):
 
 def add_extra_character(word):
     result = ""
-    extra_char = find_missing_letters(word)
+    # extra_char = find_missing_letters(word)
     for i in range(len(word) - 1):
         result += word[i]
         if word[i] == word[i + 1]:
-            while extra_char in result or extra_char == word[i]:
-                extra_char = chr(ord(extra_char) + 1)
-            result += extra_char
+            result += "X"
     result += word[-1]
     
     if len(result)%2!=0:
-        result += extra_char
+        result += "X"
     return result
     
-def find_missing_letters(word):
-    all_letters = set("abcdefghijklmnopqrstuvwxyz")
-    word_letters = set(word.lower())
-    missing_letters = all_letters - word_letters
-    return sorted(list(missing_letters))[0]
 result_word = add_extra_character(word)
 result = create_pairs(result_word)
 
@@ -62,10 +58,13 @@ print(f"2pair of text : {result}")
 mod_text = result
 
 def search(matrix,elmt):
-    for i in range(5):
-        for j in range(5):
+    # print(matrix,elmt)
+    for i in range(len(matrix)):
+        for j in range(len(matrix[i])):
+            # print(i,j)
             if matrix[i][j] == elmt:
                 return i,j
+    return 0,0
             
 
 def playfair_encrypt(mat,txt):
@@ -73,7 +72,10 @@ def playfair_encrypt(mat,txt):
     for i in txt:
         a,b = search(mat,i[0])
         c,d = search(mat,i[1])
+        print(a,b,c,d)
+    
         if b == d:
+            print('bd')
             word = ""
             if a+1>4:
                 word += mat[0][b]
@@ -86,6 +88,7 @@ def playfair_encrypt(mat,txt):
             cipher.append(word)
         
         elif a == c:
+            print('ac')
             word = ""
             if b+1>4:
                 word += mat[a][0]
@@ -144,4 +147,3 @@ print(f"Decrypted Text : {decrypt_txt}")
             
             
      
-
