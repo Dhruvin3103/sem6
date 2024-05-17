@@ -1,42 +1,52 @@
-import random, hashlib
-def is_prime(n):
-    if n <= 1:
-        return False
-    for i in range(2, int(n**0.5) + 1):
+import random
+import hashlib
+def isprime(n):
+    if n <=1: return False
+    
+    for i in range(2, int(n**0.5)+1):
         if n % i == 0:
             return False
-    return True
-def generate_prime_number():
-    while True:
-        num = random.randint(100, 1000)
-        if is_prime(num):
-            return num
-def gcd(a, b):
-    while b != 0:
-        a, b = b, a % b
+    return True 
+    
+def gcd(a,b):
+    while b!=0:
+        a, b = b, a %b 
     return a
+    
+def generate_pr_no():
+    while True:
+        a = random.randint(100,1000)
+        if isprime(a):
+            return a
+            
 def generate_keys():
-    p = generate_prime_number()
-    q = generate_prime_number()
-    n = p * q
-    phi = (p - 1) * (q - 1)
-    e = random.randint(1, phi)
-    while gcd(e, phi) != 1:
-        e = random.randint(1, phi)
+    p = generate_pr_no()
+    q = generate_pr_no()
+    n = p*q
+    phi = (p-1)*(q-1)
+    print(f"p:{p}, q:{q}, n:{n}, phi:{phi}")
+    e = random.randint(1,phi)
+    while gcd(e,phi) !=1:
+            e = random.randint(1,phi)
     d = pow(e, -1, phi)
-    return (e, n), (d, n)
-def encrypt(message, public_key):
-    e, n = public_key
-    encrypted_message = [pow(ord(char), e, n) for char in message]
-    return encrypted_message
-def decrypt(encrypted_message, private_key):
-    d, n = private_key
-    decrypted_message = [chr(pow(char, d, n)) for char in encrypted_message]
-    return ''.join(decrypted_message)
-message = "Hello, World!"
-hashed_message = hashlib.md5(message.encode()).hexdigest()
+    return (e,n),(d,n)
+    
+def encrypt(message,e,n):
+    ct = [pow(ord(i), e, n) for i in message]
+    return ct 
+def decrypt(ct, d,n):
+    pt = [ chr(pow(i,d,n)) for i in ct]
+    return "".join(pt)
+    
 public_key, private_key = generate_keys()
-encrypted_message = encrypt(message, public_key)
-decrypted_message = decrypt(encrypted_message, private_key)
-unhashed_message = hashlib.md5(decrypted_message.encode()).hexdigest()
-print(f"Original message:{message}\nHashed message:{hashed_message}\nEncryptedMeessage:{encrypted_message}\nDecryptedMsg:{decrypted_message}\nUnhashedMsg:{unhashed_message}")
+message = "okeydokey"
+mess = hashlib.md5(message.encode()).hexdigest()
+print(f"hashed message is : {mess}")
+ct = encrypt(mess,public_key[0],public_key[1])
+print(f"user A sends mess : {message} and encrypted hased mess(DS) : {ct} to user B")
+dt = decrypt(ct,private_key[0],private_key[1])
+print(f"User B decrypts DS and gets : {dt}")
+hashmess = hashlib.md5(message.encode()).hexdigest()
+print(f"User B hashes the original message and gets : {hashmess}")
+print(f"hence can we establish connection : {hashmess==dt}")
+        
